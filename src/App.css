@@ -1,5 +1,5 @@
 .App {
-  text-align: center;
+  --filter: blur(5px) brightness(30%);
 }
 
 .App-logo {

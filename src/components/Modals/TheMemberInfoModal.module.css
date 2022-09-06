@@ -1,0 +1,98 @@
+.overlay {
+  position: fixed;
+  display: flex;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+
+  background-color: rgba(0, 0, 0, 0.6);
+}
+.results__item {
+  background-color: white;
+  position: fixed;
+  margin: auto;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: justify;
+  flex-direction: column;
+  border: 2px solid black;
+  height: 700px;
+  width: 800px;
+  border-radius: 10%;
+  padding: 20px;
+  gap: 10px;
+}
+
+.explorers {
+  background-color: #f9eed7;
+}
+
+.sentinels {
+  background-color: #d9eaf0;
+}
+
+.diplomats {
+  background-color: #d6ece3;
+}
+
+.analysts {
+  background-color: #e7dfea;
+}
+
+.results__image {
+  border: 3px solid black;
+  border-radius: 50%;
+  height: 100px;
+  width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.results__image img {
+  height: 80%;
+  width: 80%;
+}
+
+.results__name {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.summary__topics {
+  display: flex;
+}
+.summary__topic {
+  padding: 5px;
+  border: 1px solid black;
+  text-align: center;
+  display: flex;
+  border-radius: 8px;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  color: black;
+  font-weight: 700;
+}
+.summary__topic:hover,
+.summary__topic--active {
+  background-color: black;
+  cursor: pointer;
+  color: white;
+}
+h4,
+h5 {
+  margin: 0;
+  padding: 0;
+}
