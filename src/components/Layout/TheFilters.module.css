@@ -94,3 +94,9 @@ select {
 select:hover {
   cursor: pointer;
 }
+
+@media screen and (max-width: 480px) {
+  .filters__info h1 {
+    font-size: 42px;
+  }
+}

@@ -90,3 +90,14 @@
   height: 80%;
   width: 80%;
 }
+@media screen and (max-width: 629px) {
+  .links__link {
+    display: none;
+  }
+  .links__signin {
+    display: flex;
+  }
+  .links__signout {
+    display: flex;
+  }
+}
