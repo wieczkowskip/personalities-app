@@ -20,8 +20,8 @@ const TheSignInModal = (props) => {
   };
 
   const POOL_DATA = {
-    UserPoolId: "eu-central-1_TxFHYBwqN",
-    ClientId: "3622gnqsgtrf9d4v3u2olfnnkf",
+    UserPoolId: process.env.REACT_APP_COGNITO_USER_POOL_ID,
+    ClientId: process.env.REACT_APP_COGNITO_CLIENT_ID,
   };
   const userPool = new CognitoUserPool(POOL_DATA);
   const signUp = (username, password) => {

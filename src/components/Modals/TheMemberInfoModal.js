@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { storeActions } from "../Store";
 import styles from "./TheMemberInfoModal.module.css";
 
-const TheMemberInfoModal = (props) => {
+const TheMemberInfoModal = () => {
   const [selectedSummaryTopic, setSelectedSummaryTopic] = useState(1);
 
   const showMemberInfo = useSelector((state) => state.showMemberInfo);
@@ -22,37 +22,16 @@ const TheMemberInfoModal = (props) => {
   const dispatch = useDispatch();
   console.log(showMemberInfo);
   const closeMemberInfoModalHandler = () => {
-    console.log("mhm");
     dispatch(storeActions.closeMemberInfoModal());
   };
   const axios = require("axios").default;
+
   async function getPersonalityTypeDescription(personalityType) {
-    const APIRequestURL = `https://zoyq4h8u8i.execute-api.eu-central-1.amazonaws.com/dev/personality-type-description/${personalityType}`;
+    const APIRequestURL = `${process.env.REACT_APP_API_SERVER_URL}/personality-type-description/${personalityType}`;
     try {
       const response = await axios.get(APIRequestURL);
-      //users = response.data.Items;
-      // setUsers(
-      //   response.data.Items.map((item) => ({
-      //     userId: item.MemberId.N,
-      //     animalPhoto: item.AnimalPhoto.S,
-      //     name: item.Name.S,
-      //     personalityType: item.PersonalityType.S,
-      //     personalityGroup: analystsGroup.includes(item.PersonalityType.S)
-      //       ? "Analysts"
-      //       : diplomatsGroup.includes(item.PersonalityType.S)
-      //       ? "Diplomats"
-      //       : sentinelsGroup.includes(item.PersonalityType.S)
-      //       ? "Sentinels"
-      //       : explorersGroup.includes(item.PersonalityType.S)
-      //       ? "Explorers"
-      //       : "None",
-      //   }))
-      // );
-      console.log(response);
       const description = response.data.Item.Description.S;
       setPersonalityTypeDescription(description);
-      // console.log(users);
-      //console.log(users[0].Name.S);
     } catch (error) {
       console.error(error);
     }
@@ -66,7 +45,6 @@ const TheMemberInfoModal = (props) => {
       getPersonalityTypeDescription(memberType);
     }
     selectSummaryTopic(1);
-    console.log(clickedUser);
   }, [memberType]);
 
   return (

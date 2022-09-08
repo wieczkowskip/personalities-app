@@ -57,19 +57,19 @@ const TheFilters = (props) => {
     let APIRequestURL = "";
     if (teamLeader == "" || teamLeader == "ypzzol") {
       if (type == "" && group == "") {
-        APIRequestURL = `https://zoyq4h8u8i.execute-api.eu-central-1.amazonaws.com/dev/current-username/${currentUsername}`;
+        APIRequestURL = `${process.env.REACT_APP_API_SERVER_URL}/current-username/${currentUsername}`;
       } else if (type == "") {
-        APIRequestURL = `https://zoyq4h8u8i.execute-api.eu-central-1.amazonaws.com/dev/current-username/${currentUsername}/personality-group/${group}`;
+        APIRequestURL = `${process.env.REACT_APP_API_SERVER_URL}/current-username/${currentUsername}/personality-group/${group}`;
       } else {
-        APIRequestURL = `https://zoyq4h8u8i.execute-api.eu-central-1.amazonaws.com/dev/current-username/${currentUsername}/personality-type/${type}`;
+        APIRequestURL = `${process.env.REACT_APP_API_SERVER_URL}/current-username/${currentUsername}/personality-type/${type}`;
       }
     } else {
       if (type == "" && group == "") {
-        APIRequestURL = ` https://zoyq4h8u8i.execute-api.eu-central-1.amazonaws.com/dev/current-username/${currentUsername}/team-leader/${teamLeader}`;
+        APIRequestURL = `${process.env.REACT_APP_API_SERVER_URL}/current-username/${currentUsername}/team-leader/${teamLeader}`;
       } else if (type == "") {
-        APIRequestURL = `https://zoyq4h8u8i.execute-api.eu-central-1.amazonaws.com/dev/current-username/${currentUsername}/team-leader/${teamLeader}/personality-group/${group}`;
+        APIRequestURL = `${process.env.REACT_APP_API_SERVER_URL}/current-username/${currentUsername}/team-leader/${teamLeader}/personality-group/${group}`;
       } else {
-        APIRequestURL = `https://zoyq4h8u8i.execute-api.eu-central-1.amazonaws.com/dev/current-username/${currentUsername}/team-leader/${teamLeader}/personality-type/${type}`;
+        APIRequestURL = `${process.env.REACT_APP_API_SERVER_URL}/current-username/${currentUsername}/team-leader/${teamLeader}/personality-type/${type}`;
       }
     }
 

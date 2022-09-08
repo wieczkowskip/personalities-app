@@ -59,7 +59,7 @@ const TheAddMemberModal = (props) => {
   const userPool = new CognitoUserPool(POOL_DATA);
 
   async function addUser(userData) {
-    const APIRequestURL = `https://zoyq4h8u8i.execute-api.eu-central-1.amazonaws.com/dev/`;
+    const APIRequestURL = process.env.REACT_APP_API_SERVER_URL;
     try {
       const response = await axios.post(APIRequestURL, userData);
       dispatch(storeActions.setAddedNewUserStatus(true));
@@ -289,7 +289,7 @@ const TheAddMemberModal = (props) => {
   async function getTeamLeaders() {
     try {
       const response = await axios.get(
-        `https://zoyq4h8u8i.execute-api.eu-central-1.amazonaws.com/dev/team-leaders`
+        `${process.env.REACT_APP_API_SERVER_URL}/team-leaders`
       );
       const teamLeaders = response.data.Items.map((item) => ({
         id: item.Id.S,

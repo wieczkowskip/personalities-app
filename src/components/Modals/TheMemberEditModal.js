@@ -109,7 +109,7 @@ const TheMemberEditModal = (props) => {
   };
 
   async function updateUser(currentUsername, newUserData) {
-    const APIRequestURL = ` https://zoyq4h8u8i.execute-api.eu-central-1.amazonaws.com/dev/current-username/${currentUsername}/member/${newUserData.id}`;
+    const APIRequestURL = `${process.env.REACT_APP_API_SERVER_URL}/current-username/${currentUsername}/member/${newUserData.id}`;
     try {
       const response = await axios.put(APIRequestURL, newUserData);
       //users = response.data.Items;

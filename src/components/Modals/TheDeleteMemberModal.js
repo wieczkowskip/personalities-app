@@ -17,8 +17,9 @@ const TheDeleteMemberModal = (props) => {
     dispatch(storeActions.closeDeleteUserModal());
   };
   //dispatch(storeActions.closeMemberInfoModal());
+
   async function getNameUser(currentUsername) {
-    const APIRequestURL = `https://zoyq4h8u8i.execute-api.eu-central-1.amazonaws.com/dev/current-username/${currentUsername}`;
+    const APIRequestURL = `${process.env.REACT_APP_API_SERVER_URL}/current-username/${currentUsername}`;
     try {
       const response = await axios.get(APIRequestURL);
       //users = response.data.Items;
@@ -55,7 +56,7 @@ const TheDeleteMemberModal = (props) => {
     }
   }, [showDeleteUser, nameOfUserLoggedIn]);
   async function deleteUser(currentUsername, userId) {
-    const APIRequestURL = `https://zoyq4h8u8i.execute-api.eu-central-1.amazonaws.com/dev/current-username/${currentUsername}/member/${userId}`;
+    const APIRequestURL = `${process.env.REACT_APP_API_SERVER_URL}/current-username/${currentUsername}/member/${userId}`;
     try {
       const response = await axios.delete(APIRequestURL);
       //users = response.data.Items;

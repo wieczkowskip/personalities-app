@@ -203,7 +203,7 @@ const TheSummary = (props) => {
   async function getTeamLeaders() {
     try {
       const response = await axios.get(
-        `https://zoyq4h8u8i.execute-api.eu-central-1.amazonaws.com/dev/team-leaders`
+        `${process.env.REACT_APP_API_SERVER_URL}/team-leaders`
       );
       const teamLeaders = response.data.Items.map((item) => ({
         id: item.Id.S,

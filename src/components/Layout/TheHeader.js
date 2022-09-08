@@ -49,7 +49,7 @@ const TheHeader = (props) => {
   async function getInfoFromLoggedUser(username) {
     try {
       const response = await axios.get(
-        `https://zoyq4h8u8i.execute-api.eu-central-1.amazonaws.com/dev/current-username/${username}/member/${username}`
+        `${process.env.REACT_APP_API_SERVER_URL}/current-username/${username}/member/${username}`
       );
       const user = response.data.Items[0];
       //console.log(response);
