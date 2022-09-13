@@ -1,7 +1,8 @@
 import styles from "./TheIntroduction.module.css";
 import introduction from "../../assets/personalities.jpg";
 import { Link } from "react-scroll";
-const TheIntroduction = (props) => {
+//the module contains the entire "introduction" section
+const TheIntroduction = () => {
   return (
     <div id="personalities" className={styles.introduction}>
       <div className={styles.introduction__info}>

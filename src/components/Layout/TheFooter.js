@@ -1,5 +1,6 @@
 import styles from "./TheFooter.module.css";
-const TheFooter = (props) => {
+//the module contains the entire "footer" section
+const TheFooter = () => {
   return (
     <div className={styles.footer}>
       <a href="https://www.flaticon.com/free-icons/cat" title="cat icons">

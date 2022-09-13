@@ -1,15 +1,12 @@
-import { Slider } from "@mui/material";
-import {
-  CognitoUserAttribute,
-  CognitoUserPool,
-} from "amazon-cognito-identity-js";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { storeActions } from "../Store";
-import styles from "./TheAddMemberModal.module.css";
+import { Slider } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 
-const TheAddMemberModal = (props) => {
+import styles from "./TheAddMemberModal.module.css";
+//the module contains a modal in which a user with administrator right can add a new user
+const TheAddMemberModal = () => {
   const axios = require("axios").default;
 
   const showAddUser = useSelector((state) => state.showAddUser);
@@ -35,6 +32,8 @@ const TheAddMemberModal = (props) => {
   const [teamLeaders, setTeamLeaders] = useState([]);
 
   const dispatch = useDispatch();
+
+  //close TheAddMemberModal modal and set default values
   const closeAddUserModalHandler = () => {
     dispatch(storeActions.closeAddUserModal());
     setNameIsValid(false);
@@ -50,45 +49,18 @@ const TheAddMemberModal = (props) => {
     setStrategyNameInput("Constant Improvement");
     setAnonymizeInput(false);
   };
-  //dispatch(storeActions.closeMemberInfoModal());
-
-  const POOL_DATA = {
-    UserPoolId: "eu-central-1_TxFHYBwqN",
-    ClientId: "3622gnqsgtrf9d4v3u2olfnnkf",
-  };
-  const userPool = new CognitoUserPool(POOL_DATA);
-
+  //adding a new team member to the database
   async function addUser(userData) {
     const APIRequestURL = process.env.REACT_APP_API_SERVER_URL;
     try {
       const response = await axios.post(APIRequestURL, userData);
       dispatch(storeActions.setAddedNewUserStatus(true));
-      //users = response.data.Items;
-      // setUsers(
-      //   response.data.Items.map((item) => ({
-      //     userId: item.MemberId.N,
-      //     animalPhoto: item.AnimalPhoto.S,
-      //     name: item.Name.S,
-      //     personalityType: item.PersonalityType.S,
-      //     personalityGroup: analystsGroup.includes(item.PersonalityType.S)
-      //       ? "Analysts"
-      //       : diplomatsGroup.includes(item.PersonalityType.S)
-      //       ? "Diplomats"
-      //       : sentinelsGroup.includes(item.PersonalityType.S)
-      //       ? "Sentinels"
-      //       : explorersGroup.includes(item.PersonalityType.S)
-      //       ? "Explorers"
-      //       : "None",
-      //   }))
-      // );
-
-      console.log(response);
-      //console.log(users[0].Name.S);
     } catch (error) {
       console.error(error);
     }
   }
-
+  //calculating the group, personality type and strategy based on the percentages of individual personality components and
+  //assigning the calculated values to the appropriate variables
   const calcGroupTypeAndStrategy = (data) => {
     const typeName = `${data.extraverted >= 50 ? "E" : "I"}${
       data.intuitive >= 50 ? "N" : "S"
@@ -114,7 +86,6 @@ const TheAddMemberModal = (props) => {
     const analystsRegex = /(I|E)NT(J|P)/;
     const diplomatsRegex = /(I|E)NF(J|P)/;
     const sentinelsRegex = /(I|E)S(T|F)J/;
-    //const explorersRegex = "(I|E)S(T|F)P";
 
     const personalityGroupName = analystsRegex.test(typeName)
       ? "Analysts"
@@ -139,16 +110,14 @@ const TheAddMemberModal = (props) => {
     const personalityTypeName = personalityTypes.find(
       (item) => item.type === typeName
     ).name;
-    console.log(personalityTypeName);
-    console.log(typeName);
     setPersonalityTypeInput(personalityTypeName);
     setPersonalityGroupInput(personalityGroupName);
     setStrategyNameInput(stategyName);
   };
-
+  //adding a new team member, setting default values for the form and closing the modal
   const formSubmissionHandler = (event) => {
     event.preventDefault();
-    const updatedUser = {
+    const newUser = {
       anonymize: +anonymizeInput,
       memberId: nameInput.toLowerCase(),
       name: nameInput,
@@ -163,25 +132,18 @@ const TheAddMemberModal = (props) => {
       judging: judgingValueInput,
       assertive: assertiveValueInput,
     };
-    console.log("here");
-    console.log(updatedUser);
-    addUser(updatedUser);
+    addUser(newUser);
     setNameInput("");
     setAnimalPhotoInput("cat");
     setPersonalityTypeInput("Architect");
     setNameIsValid(false);
     closeAddUserModalHandler();
   };
-
-  let test = 0;
-
+  //setting a selected avatar in the form for adding a new team member
   const updateAnimalPhotoInputHandler = (e) => {
     setAnimalPhotoInput(e.target.value);
   };
-
-  const updatePersonalityTypeInputHandler = (e) => {
-    setPersonalityTypeInput(e.target.value);
-  };
+  //setting a selected name in the form for adding a new team member and checking the correctness of the name
   const updateNameInputHandler = (e) => {
     setNameInput(e.target.value);
     if (new RegExp("(?=.{3,})").test(e.target.value)) {
@@ -190,32 +152,40 @@ const TheAddMemberModal = (props) => {
       setNameIsValid(false);
     }
   };
+  //setting a selected team leader in the form for adding a new team member
   const updateSelectedTeamLeaderHandler = (e) => {
     setSelectedTeamLeader(e.target.value);
   };
+  //setting a selected percentage for a extraverted component in the form for adding a new team member
   const updateExtravertedValueInputHandler = (e) => {
     const value = Math.max(0, Math.min(100, e.target.value));
     setExtravertedValueInput(value);
   };
+  //setting a selected percentage for a intuitive component in the form for adding a new team member
   const updateIntuitiveValueInputHandler = (e) => {
     const value = Math.max(0, Math.min(100, e.target.value));
     setIntuitiveValueInput(value);
   };
+  //setting a selected percentage for a thinking component in the form for adding a new team member
   const updateThinkingValueInputHandler = (e) => {
     const value = Math.max(0, Math.min(100, e.target.value));
     setThinkingValueInput(value);
   };
+  //setting a selected percentage for a judging component in the form for adding a new team member
   const updateJudgingValueInputHandler = (e) => {
     const value = Math.max(0, Math.min(100, e.target.value));
     setJudgingValueInput(value);
   };
+  //setting a selected percentage for a assertive component in the form for adding a new team member
   const updateAssertiveValueInputHandler = (e) => {
     const value = Math.max(0, Math.min(100, e.target.value));
     setAssertiveValueInput(value);
   };
+  //getting a list of team leaders from the database after switching on the modal
   useEffect(() => {
     getTeamLeaders();
   }, []);
+  //calculation of the group, personality type and strategy after each change in the percentage of the personality components
   useEffect(() => {
     const personalityComponentsValue = {
       extraverted: extravertedValueInput,
@@ -224,7 +194,6 @@ const TheAddMemberModal = (props) => {
       judging: judgingValueInput,
       assertive: assertiveValueInput,
     };
-    console.log(personalityComponentsValue);
     calcGroupTypeAndStrategy(personalityComponentsValue);
   }, [
     extravertedValueInput,
@@ -233,6 +202,7 @@ const TheAddMemberModal = (props) => {
     judgingValueInput,
     assertiveValueInput,
   ]);
+
   const mark = [
     [
       {
@@ -286,6 +256,7 @@ const TheAddMemberModal = (props) => {
     ],
   ];
 
+  //getting a list of team leaders from the database
   async function getTeamLeaders() {
     try {
       const response = await axios.get(
@@ -295,15 +266,13 @@ const TheAddMemberModal = (props) => {
         id: item.Id.S,
         name: item.Name.S,
       }));
-      console.log(teamLeaders);
       setTeamLeaders(teamLeaders);
-
-      //console.log(response.data.Items);
     } catch (error) {
       console.error(error);
     }
   }
 
+  //changing the data anonymization option in the form
   const changeAnonymizeInput = () => {
     setAnonymizeInput(!anonymizeInput);
   };
@@ -354,9 +323,6 @@ const TheAddMemberModal = (props) => {
                     <option value={item.id}>{item.name}</option>
                   </>
                 ))}
-                {/* <option value="Tomasz">Tomasz</option>
-                <option value="Karolina">Karolina</option>
-                <option value="Damian">Damian</option> */}
               </select>
               <div className={styles.menu__image}>
                 <img
@@ -398,7 +364,6 @@ const TheAddMemberModal = (props) => {
                   min={0}
                   step={1}
                   marks={mark[0]}
-                  // valueLabelDisplay="auto"
                   value={extravertedValueInput}
                   onChange={updateExtravertedValueInputHandler}
                 />
@@ -463,36 +428,6 @@ const TheAddMemberModal = (props) => {
               <h3>Group: {personalityGroupInput}</h3>
               <h3>Type: {personalityTypeInput}</h3>
               <h3>Strategy: {strategyNameInput}</h3>
-              {/* <label for="personalityType">Personality Type:</label>
-              <select
-                name="personalityType"
-                value={personalityTypeInput}
-                onChange={updatePersonalityTypeInputHandler}
-              >
-                <option value="Architect">Architect</option>
-                <option value="Logician">Logician</option>
-                <option value="Commander">Commander</option>
-                <option value="Debater">Debater</option>
-                <option value="Advocate">Advocate</option>
-                <option value="Mediator">Mediator</option>
-                <option value="Protagonist">Protagonist</option>
-                <option value="Campaigner">Campaigner</option>
-                <option value="Logistician">Logistician</option>
-                <option value="Defender">Defender</option>
-                <option value="Executive">Executive</option>
-                <option value="Consul">Consul</option>
-                <option value="Virtuoso">Virtuoso</option>
-                <option value="Adventurer">Adventurer</option>
-                <option value="Entrepreneur">Entrepreneur</option>
-                <option value="Entertainer">Entertainer</option>
-              </select> */}
-              {/* {0 == 0 && (
-                <p className={styles.form__error_info}>
-                  Name must not be empty.
-                </p>
-              )} */}
-
-              {/* <p className={styles.form__error_info}>Error msg</p> */}
             </form>
           </div>
         </>

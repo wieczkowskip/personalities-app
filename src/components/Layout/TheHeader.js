@@ -1,17 +1,20 @@
-import { Link } from "react-scroll";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import styles from "./TheHeader.module.css";
-import logo from "../../assets/behaviour.png";
-import TheSignInModal from "../Modals/TheSignInModal";
-import { storeActions } from "../Store/index.js";
+import { Link } from "react-scroll";
 import { CognitoUserPool } from "amazon-cognito-identity-js";
-import { useEffect } from "react";
+
+import logo from "../../assets/behaviour.png";
+
+import { storeActions } from "../Store/index.js";
+
+import TheSignInModal from "../Modals/TheSignInModal";
 import TheMemberEditModal from "../Modals/TheMemberEditModal";
 import TheAddMemberModal from "../Modals/TheAddMemberModal";
 
-const TheHeader = (props) => {
+import styles from "./TheHeader.module.css";
+
+//the module contains the entire "header" section
+const TheHeader = () => {
   const axios = require("axios").default;
 
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -25,54 +28,54 @@ const TheHeader = (props) => {
 
   const dispatch = useDispatch();
 
+  //TheSignInModal display support
   const showSignInModalHandler = () => {
     dispatch(storeActions.showSignInModal());
   };
 
   const POOL_DATA = {
-    UserPoolId: "eu-central-1_TxFHYBwqN",
-    ClientId: "3622gnqsgtrf9d4v3u2olfnnkf",
+    UserPoolId: process.env.REACT_APP_COGNITO_USER_POOL_ID,
+    ClientId: process.env.REACT_APP_COGNITO_CLIENT_ID,
   };
   const userPool = new CognitoUserPool(POOL_DATA);
   const currentUser = userPool.getCurrentUser();
 
+  //logout of the currently logged in user
   const logOutUser = () => {
     currentUser.signOut();
     dispatch(storeActions.logOutUser());
   };
+
   const users = useSelector((state) => state.users);
-  console.log(nameOfUserLoggedIn);
   const userLoggedIn = users.find(
     (item) => item.userId === nameOfUserLoggedIn.toLowerCase()
   );
 
+  //getting data from the server about the logged in user
   async function getInfoFromLoggedUser(username) {
     try {
       const response = await axios.get(
         `${process.env.REACT_APP_API_SERVER_URL}/current-username/${username}/member/${username}`
       );
       const user = response.data.Items[0];
-      //console.log(response);
 
       dispatch(storeActions.setAnimalPhotoOfUserLoggedIn(user.AnimalPhoto.S));
       dispatch(storeActions.setTypeOfUserLoggedIn(user.PersonalityType.S));
-
-      console.log(response.data.Item);
     } catch (error) {
       console.error(error);
     }
   }
 
+  //TheSignInModal display support
   const changeShowUserMenuValue = () => {
     setShowUserMenu(!showUserMenu);
   };
-
+  //TheMemberEditModal display support
   const showEditUserModalHandler = () => {
     dispatch(storeActions.showEditUserModal());
   };
-
+  //getting data about the currently logged in user after each login of a new user
   useEffect(() => {
-    console.log(animalPhotoOfUserLoggedIn);
     if (currentUser != null) {
       dispatch(storeActions.setNameOfUserLoggedIn(currentUser.username));
     }

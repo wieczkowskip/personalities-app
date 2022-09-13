@@ -1,29 +1,32 @@
-import styles from "./TheSummary.module.css";
-import summary from "../../assets/team.jpg";
-import TheDeleteMemberModal from "../Modals/TheDeleteMemberModal";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { storeActions } from "../Store";
-import { useEffect, useState } from "react";
 import { CognitoUserPool } from "amazon-cognito-identity-js";
 import axios from "axios";
-const TheSummary = (props) => {
+
+import summary from "../../assets/team.jpg";
+
+import TheDeleteMemberModal from "../Modals/TheDeleteMemberModal";
+
+import styles from "./TheSummary.module.css";
+//the module contains the entire "summary" section
+const TheSummary = () => {
   const users = useSelector((state) => state.usersForSummary);
 
   const POOL_DATA = {
-    UserPoolId: "eu-central-1_TxFHYBwqN",
-    ClientId: "3622gnqsgtrf9d4v3u2olfnnkf",
+    UserPoolId: process.env.REACT_APP_COGNITO_USER_POOL_ID,
+    ClientId: process.env.REACT_APP_COGNITO_CLIENT_ID,
   };
   const userPool = new CognitoUserPool(POOL_DATA);
 
+  //checking if the logged in user has administrator rights
   const checkAdmin = () => {
     const user = userPool.getCurrentUser();
     if (user != null) {
       user.getSession((err, session) => {
         if (err) {
-          console.log("no session: " + err);
+          console.error("no session: " + err);
         } else {
-          console.log(user);
-          console.log(session);
           if (
             user.getSignInUserSession().getAccessToken().payload[
               "cognito:groups"
@@ -68,20 +71,27 @@ const TheSummary = (props) => {
   const nameOfUserLoggedIn = useSelector((state) => state.nameOfUserLoggedIn);
   const selectedTeamLeader = useSelector((state) => state.selectedTeamLeader);
 
+  //TheAddMemberModal display support
   const showAddMemberModalHandler = () => {
     dispatch(storeActions.showAddUserModal());
   };
+  //TheDeleteMemberModal display support
   const showDeleteMemberModalHandler = () => {
     dispatch(storeActions.showDeleteUserModal());
   };
-
+  //change of the current topic regarding the team summary
   const selectSummaryTopic = (numberOfTopic) => {
     setSelectedSummaryTopic(numberOfTopic);
   };
+  //change of the currently selected team leader
   const setSelectedTeamLeader = (e) => {
     dispatch(storeActions.setSelectedTeamLeader(e.target.value));
   };
-
+  //setting the current user list in the usersForSummary[] variable in redux store
+  const setUsersForSummary = (value) => {
+    dispatch(storeActions.setUsersForSummary(value));
+  };
+  //calculating the average percentage of the selected personality component
   const componentAvgValue = (userData, componentName) => {
     return Math.round(
       (userData
@@ -93,8 +103,8 @@ const TheSummary = (props) => {
         100
     );
   };
+  //calculating the average percentage of all personality components and setting them to the appropriate variables
   const calcPercentageOfThePersonalityTypeComponent = (userData) => {
-    console.log(userData);
     const extravertedAvgValue = componentAvgValue(userData, "extraverted");
     const intuitiveAvgValue = componentAvgValue(userData, "intuitive");
     const thinkingAvgValue = componentAvgValue(userData, "thinking");
@@ -106,7 +116,7 @@ const TheSummary = (props) => {
     setJudgingAvg(judgingAvgValue);
     setAssertiveAvg(assertiveAvgValue);
   };
-
+  //calculating the sum of team members based on personality groups
   const calcAmountOfWorkMembersInPersonalityGroups = (userData) => {
     const sentinels = userData
       .map((item) => (item.personalityGroup === "Sentinels" ? 1 : 0))
@@ -128,7 +138,7 @@ const TheSummary = (props) => {
     ].sort((a, b) => b.amount - a.amount);
     setPersonalityGroupsAmount(personalityGroups);
   };
-
+  //calculating the sum of team members based on personality types
   const calcAmountOfWorkMembersInPersonalityTypes = (userData) => {
     const architect = userData
       .map((item) => (item.personalityType === "Architect" ? 1 : 0))
@@ -199,7 +209,7 @@ const TheSummary = (props) => {
     ].sort((a, b) => b.amount - a.amount);
     setPersonalityTypesAmount(personalityTypes);
   };
-
+  //getting a list of team leaders from the database
   async function getTeamLeaders() {
     try {
       const response = await axios.get(
@@ -209,24 +219,68 @@ const TheSummary = (props) => {
         id: item.Id.S,
         name: item.Name.S,
       }));
-      console.log(teamLeaders);
       setTeamLeaders(teamLeaders);
-
-      //console.log(response.data.Items);
     } catch (error) {
       console.error(error);
     }
   }
+  //getting a list of team members based on the selected team leader,
+  //store the result in the usersForSummary[] variable in redux
+  async function getUsersForSummary(currentUsername, teamLeader) {
+    let APIRequestURL = "";
+    if (teamLeader == "" || teamLeader == "ypzzol") {
+      APIRequestURL = `${process.env.REACT_APP_API_SERVER_URL}/current-username/${currentUsername}`;
+    } else {
+      APIRequestURL = `${process.env.REACT_APP_API_SERVER_URL}/current-username/${currentUsername}/team-leader/${teamLeader}`;
+    }
+
+    try {
+      const response = await axios.get(APIRequestURL);
+      setUsersForSummary(
+        response.data.Items.map((item) => ({
+          anonymize: item.Anonymize.BOOL,
+          userId: item.MemberId.S,
+          animalPhoto: item.AnimalPhoto.S,
+          name: item.Name.S,
+          teamLeader: item.TeamLeader.S,
+          strategy: item.Strategy.S,
+          personalityType: item.PersonalityType.S,
+          personalityGroup: item.Group.S,
+          personalityComponents: {
+            extraverted: item.Extraverted.N,
+            introverted: item.Introverted.N,
+            intuitive: item.Intuitive.N,
+            observant: item.Observant.N,
+            thinking: item.Thinking.N,
+            feeling: item.Feeling.N,
+            judging: item.Judging.N,
+            prospecting: item.Prospecting.N,
+            assertive: item.Assertive.N,
+            turbulent: item.Turbulent.N,
+          },
+        }))
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  //checking if the logged in user has administrator rights and getting the list of team leaders from databse each time a new user logs in
   useEffect(() => {
     checkAdmin();
     getTeamLeaders();
-
+  }, [nameOfUserLoggedIn]);
+  //getting the team members list based on the team leader each time a new user logs in or the team leader is changed
+  useEffect(() => {
+    getUsersForSummary(nameOfUserLoggedIn.toLowerCase(), selectedTeamLeader);
+  }, [nameOfUserLoggedIn, selectedTeamLeader]);
+  //calculating all needed values for the team summary section after each change of the team member list
+  useEffect(() => {
     if (users.length > 0) {
       calcPercentageOfThePersonalityTypeComponent(users);
       calcAmountOfWorkMembersInPersonalityGroups(users);
       calcAmountOfWorkMembersInPersonalityTypes(users);
     }
-  }, [nameOfUserLoggedIn, users]);
+  }, [users]);
   return (
     <>
       <TheDeleteMemberModal />
@@ -251,9 +305,6 @@ const TheSummary = (props) => {
                       <option value={item.id}>{item.name}</option>
                     </>
                   ))}
-                  {/* <option value="">Tomasz</option>
-                  <option value="lstvxr">Karolina</option>
-                  <option value="fszlao">Damian</option> */}
                 </select>
               </div>
               <p>

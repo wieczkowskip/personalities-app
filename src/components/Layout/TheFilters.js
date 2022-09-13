@@ -1,23 +1,20 @@
-import { setSelectionRange } from "@testing-library/user-event/dist/utils";
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { storeActions } from "../Store/index.js";
 import TheMemberInfoModal from "../Modals/TheMemberInfoModal.js";
 
 import styles from "./TheFilters.module.css";
-import { current } from "@reduxjs/toolkit";
 
-const TheFilters = (props) => {
+//the module contains the entire "filters" section
+const TheFilters = () => {
   const axios = require("axios").default;
   const users = useSelector((state) => state.users);
 
   const dispatch = useDispatch();
-
+  //set filtered users in users[] in redux store
+  //it's triggered every time the team leader, group or personality type changes
   const setUsers = (value) => {
     dispatch(storeActions.setUsers(value));
-  };
-  const setUsersForSummary = (value) => {
-    dispatch(storeActions.setUsersForSummary(value));
   };
 
   const showMemberInfo = useSelector((state) => state.showMemberInfo);
@@ -34,6 +31,8 @@ const TheFilters = (props) => {
 
   const selectedTeamLeader = useSelector((state) => state.selectedTeamLeader);
 
+  //setting the data of the selected team member,
+  //needed to display the data in the "TheMemberInfoModal" modal
   const showMemberInfoModalHandler = (data) => {
     dispatch(storeActions.setNameOfClickedMember(data[0]));
     dispatch(storeActions.setAnimalPhotoOfClickedMember(data[1]));
@@ -45,14 +44,19 @@ const TheFilters = (props) => {
 
   const [selectGroup, setSelectGroup] = useState("");
   const [selectType, setSelectType] = useState("");
+
+  //setting the currently selected personality group and clear selected personality type
   const changeSelectGroup = (e) => {
     setSelectGroup(e.target.value);
     setSelectType("");
   };
+  //setting the currently selected personality type
   const changeSelectType = (e) => {
     setSelectType(e.target.value);
   };
 
+  //getting a list of users from the database taking into account the team leader, group and personality type,
+  //the user list is stored in the users[] variable in redux store
   async function getUsers(currentUsername, teamLeader, group, type) {
     let APIRequestURL = "";
     if (teamLeader == "" || teamLeader == "ypzzol") {
@@ -75,7 +79,6 @@ const TheFilters = (props) => {
 
     try {
       const response = await axios.get(APIRequestURL);
-      console.log(response);
       setUsers(
         response.data.Items.map((item) => ({
           anonymize: item.Anonymize.BOOL,
@@ -104,11 +107,8 @@ const TheFilters = (props) => {
       console.error(error);
     }
   }
-  useEffect(() => {
-    if (selectGroup == "" && selectType == "") {
-      setUsersForSummary(users);
-    }
-  }, [users]);
+  //getting data after each change of the logged in user, set team leader, group or personality type.
+  //"TheAddMemberModal" and "TheDeleteMemberModal" modal display support
   useEffect(() => {
     if (addedNewUserStatus) {
       dispatch(storeActions.setAddedNewUserStatus(false));
