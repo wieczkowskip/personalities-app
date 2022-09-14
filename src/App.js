@@ -4,7 +4,6 @@ import TheFooter from "./components/Layout/TheFooter";
 import TheHeader from "./components/Layout/TheHeader";
 import TheIntroduction from "./components/Layout/TheIntroduction";
 import TheSummary from "./components/Layout/TheSummary";
-import TheSignInModal from "./components/Modals/TheSignInModal";
 
 function App() {
   return (

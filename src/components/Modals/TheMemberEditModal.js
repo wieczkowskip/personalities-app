@@ -1,43 +1,41 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { storeActions } from "../Store";
-import styles from "./TheMemberEditModal.module.css";
-import Checkbox from "@mui/material/Checkbox";
+
 import Slider from "@mui/material/Slider";
 
-const TheMemberEditModal = (props) => {
+import styles from "./TheMemberEditModal.module.css";
+//the module contains a modal that is used to change the account data of the currently logged in user
+const TheMemberEditModal = () => {
   const axios = require("axios").default;
 
   const [anonymizeCheckbox, setAnonymizeCheckbox] = useState(false);
+
   const [extravertedEditValue, setExtravertedEditValue] = useState();
   const [intuitiveEditValue, setIntuitiveEditValue] = useState();
-
   const [thinkingEditValue, setThinkingEditValue] = useState();
-
   const [judgingEditValue, setJudgingEditValue] = useState();
-
   const [assertiveEditValue, setAssertiveEditValue] = useState();
+
   const [personalityTypeInput, setPersonalityTypeInput] = useState("");
   const [personalityGroupInput, setPersonalityGroupInput] = useState("");
   const [strategyNameInput, setStrategyNameInput] = useState("");
 
   const showEditUser = useSelector((state) => state.showEditUser);
   const nameOfUserLoggedIn = useSelector((state) => state.nameOfUserLoggedIn);
-  const typeOfUserLoggedIn = useSelector((state) => state.typeOfUserLoggedIn);
   const animalPhotoOfUserLoggedIn = useSelector(
     (state) => state.animalPhotoOfUserLoggedIn
   );
-  const [editTypeValue, setEditTypeValue] = useState("");
   const [editAnimalPhotoValue, setEditAnimalPhotoValue] = useState("");
 
-  useEffect(() => {
-    setEditTypeValue(typeOfUserLoggedIn);
-  }, [typeOfUserLoggedIn]);
+  //setting the initial avatar downloaded from the database for the currently logged in user
   useEffect(() => {
     setEditAnimalPhotoValue(animalPhotoOfUserLoggedIn);
   }, [animalPhotoOfUserLoggedIn]);
 
   const dispatch = useDispatch();
+
+  //closing the modal and setting the values of individual personality components for the currently logged in user in accordance with the data from the database
   const closeEditUserModalHandler = () => {
     dispatch(storeActions.closeEditUserModal());
     if (userLoggedIn != undefined) {
@@ -49,8 +47,8 @@ const TheMemberEditModal = (props) => {
       setAssertiveEditValue(userLoggedIn.personalityComponents.assertive);
     }
   };
-  //dispatch(storeActions.closeMemberInfoModal());
 
+  //calculation of the group and personality type and strategy based on the percentage data of individual personality components
   const calcGroupTypeAndStrategy = (data) => {
     const typeName = `${data.extraverted >= 50 ? "E" : "I"}${
       data.intuitive >= 50 ? "N" : "S"
@@ -76,7 +74,6 @@ const TheMemberEditModal = (props) => {
     const analystsRegex = /(I|E)NT(J|P)/;
     const diplomatsRegex = /(I|E)NF(J|P)/;
     const sentinelsRegex = /(I|E)S(T|F)J/;
-    //const explorersRegex = "(I|E)S(T|F)P";
 
     const personalityGroupName = analystsRegex.test(typeName)
       ? "Analysts"
@@ -101,44 +98,22 @@ const TheMemberEditModal = (props) => {
     const personalityTypeName = personalityTypes.find(
       (item) => item.type === typeName
     ).name;
-    console.log(personalityTypeName);
-    console.log(typeName);
     setPersonalityTypeInput(personalityTypeName);
     setPersonalityGroupInput(personalityGroupName);
     setStrategyNameInput(stategyName);
   };
-
+  //updating user data in the database
   async function updateUser(currentUsername, newUserData) {
     const APIRequestURL = `${process.env.REACT_APP_API_SERVER_URL}/current-username/${currentUsername}/member/${newUserData.id}`;
     try {
       const response = await axios.put(APIRequestURL, newUserData);
-      //users = response.data.Items;
-      // setUsers(
-      //   response.data.Items.map((item) => ({
-      //     userId: item.MemberId.N,
-      //     animalPhoto: item.AnimalPhoto.S,
-      //     name: item.Name.S,
-      //     personalityType: item.PersonalityType.S,
-      //     personalityGroup: analystsGroup.includes(item.PersonalityType.S)
-      //       ? "Analysts"
-      //       : diplomatsGroup.includes(item.PersonalityType.S)
-      //       ? "Diplomats"
-      //       : sentinelsGroup.includes(item.PersonalityType.S)
-      //       ? "Sentinels"
-      //       : explorersGroup.includes(item.PersonalityType.S)
-      //       ? "Explorers"
-      //       : "None",
-      //   }))
-      // );
 
-      console.log(response);
       dispatch(storeActions.setEditUserStatus(true));
-      //console.log(users[0].Name.S);
     } catch (error) {
       console.error(error);
     }
   }
-
+  //submitting the form, updating user data in the database and closing the modal
   const formSubmissionHandler = (event) => {
     event.preventDefault();
     const updatedUser = {
@@ -154,7 +129,6 @@ const TheMemberEditModal = (props) => {
       judging: judgingEditValue,
       assertive: assertiveEditValue,
     };
-    console.log(updatedUser);
     dispatch(
       storeActions.setAnimalPhotoOfUserLoggedIn(updatedUser.animalPhoto)
     );
@@ -162,24 +136,15 @@ const TheMemberEditModal = (props) => {
     updateUser(nameOfUserLoggedIn.toLowerCase(), updatedUser);
     closeEditUserModalHandler();
   };
-
+  //setting the currently selected user avatar
   const setEditAnimalPhotoHandler = (e) => {
     setEditAnimalPhotoValue(e.target.value);
   };
 
-  const setEditTypeHandler = (e) => {
-    setEditTypeValue(e.target.value);
-  };
   const users = useSelector((state) => state.users);
   const userLoggedIn = users.find(
     (item) => item.userId === nameOfUserLoggedIn.toLowerCase()
   );
-  console.log(users);
-  console.log(userLoggedIn);
-
-  const changeAnonymizeCheckbox = () => {
-    setAnonymizeCheckbox(!anonymizeCheckbox);
-  };
 
   const mark = [
     [
@@ -233,27 +198,33 @@ const TheMemberEditModal = (props) => {
       },
     ],
   ];
-
+  //setting the current percentage for the extraverted personality component
   const updateExtravertedValueInputHandler = (e) => {
     const value = Math.max(0, Math.min(100, e.target.value));
     setExtravertedEditValue(value);
   };
+  //setting the current percentage for the intuitive personality component
   const updateIntuitiveValueInputHandler = (e) => {
     const value = Math.max(0, Math.min(100, e.target.value));
     setIntuitiveEditValue(value);
   };
+  //setting the current percentage for the thinking personality component
   const updateThinkingValueInputHandler = (e) => {
     const value = Math.max(0, Math.min(100, e.target.value));
     setThinkingEditValue(value);
   };
+  //setting the current percentage for the judging personality component
   const updateJudgingValueInputHandler = (e) => {
     const value = Math.max(0, Math.min(100, e.target.value));
     setJudgingEditValue(value);
   };
+  //setting the current percentage for the assertive personality component
   const updateAssertiveValueInputHandler = (e) => {
     const value = Math.max(0, Math.min(100, e.target.value));
     setAssertiveEditValue(value);
   };
+  //setting initial values from daabase for the logged in user,
+  //called each time a new user logs in
   useEffect(() => {
     if (userLoggedIn != undefined) {
       setAnonymizeCheckbox(userLoggedIn.anonymize);
@@ -264,6 +235,8 @@ const TheMemberEditModal = (props) => {
       setAssertiveEditValue(userLoggedIn.personalityComponents.assertive);
     }
   }, [userLoggedIn]);
+  //calculating the group and personality type and strategy based on the percentage data of individual personality components,
+  //called each time the value of any personality component changes
   useEffect(() => {
     const personalityComponentsValue = {
       extraverted: extravertedEditValue,
@@ -272,7 +245,6 @@ const TheMemberEditModal = (props) => {
       judging: judgingEditValue,
       assertive: assertiveEditValue,
     };
-    console.log(personalityComponentsValue);
     calcGroupTypeAndStrategy(personalityComponentsValue);
   }, [
     extravertedEditValue,
@@ -291,19 +263,6 @@ const TheMemberEditModal = (props) => {
           ></div>
           <div className={styles.modal}>
             <form className={styles.form} onSubmit={formSubmissionHandler}>
-              {/* {anonymizeCheckbox.toString()}
-              {extravertedEditValue}
-              {intuitiveEditValue}
-              {thinkingEditValue}
-              {judgingEditValue}
-              {assertiveEditValue}
-              {personalityTypeInput}
-              {personalityGroupInput}
-              {strategyNameInput} */}
-              {/* <Checkbox
-                checked={anonymizeCheckbox}
-                onChange={changeAnonymizeCheckbox}
-              /> */}
               <div className={styles.menu__image}>
                 <img
                   src={`/images/${editAnimalPhotoValue}.png`}
@@ -337,7 +296,6 @@ const TheMemberEditModal = (props) => {
                 min={0}
                 step={1}
                 marks={mark[0]}
-                // valueLabelDisplay="auto"
                 value={extravertedEditValue}
                 onChange={updateExtravertedValueInputHandler}
               />

@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { storeActions } from "../Store";
-import styles from "./TheMemberInfoModal.module.css";
 
+import styles from "./TheMemberInfoModal.module.css";
+//modal displays detailed information about the selected team member
 const TheMemberInfoModal = () => {
   const [selectedSummaryTopic, setSelectedSummaryTopic] = useState(1);
 
@@ -19,13 +20,17 @@ const TheMemberInfoModal = () => {
   const memberStrategy = useSelector((state) => state.strategyOfClickedMember);
   const [personalityTypeDescription, setPersonalityTypeDescription] =
     useState("");
+
   const dispatch = useDispatch();
-  console.log(showMemberInfo);
+
+  //closing the modal
   const closeMemberInfoModalHandler = () => {
     dispatch(storeActions.closeMemberInfoModal());
   };
+
   const axios = require("axios").default;
 
+  //getting a personality type description from the database and displaying it in the modal
   async function getPersonalityTypeDescription(personalityType) {
     const APIRequestURL = `${process.env.REACT_APP_API_SERVER_URL}/personality-type-description/${personalityType}`;
     try {
@@ -36,10 +41,12 @@ const TheMemberInfoModal = () => {
       console.error(error);
     }
   }
+  //setting the currently selected topic by a user
   const selectSummaryTopic = (topicNumber) => {
     setSelectedSummaryTopic(topicNumber);
   };
-
+  //getting a personality type description from the database and selecting first summary topic about selected team member,
+  //called each time the personality type of a selected team member changes
   useEffect(() => {
     if (memberType != "") {
       getPersonalityTypeDescription(memberType);

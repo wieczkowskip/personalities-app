@@ -8,12 +8,14 @@ import {
 import { useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux/es/exports";
 import { storeActions } from "../Store/index.js";
-import styles from "./TheSignInModal.module.css";
 
-const TheSignInModal = (props) => {
+import styles from "./TheSignInModal.module.css";
+//modal displays the user's login panel
+const TheSignInModal = () => {
   const signInActive = useSelector((state) => state.signInActive);
   const dispatch = useDispatch();
-  console.log(signInActive);
+
+  //closing the modal
   const closeSignInModalHandler = () => {
     dispatch(storeActions.closeSignInModal());
     setInputsAreTouched(false);
@@ -24,6 +26,7 @@ const TheSignInModal = (props) => {
     ClientId: process.env.REACT_APP_COGNITO_CLIENT_ID,
   };
   const userPool = new CognitoUserPool(POOL_DATA);
+  //new user account registration in Cognito
   const signUp = (username, password) => {
     const user = {
       username: username,
@@ -42,14 +45,13 @@ const TheSignInModal = (props) => {
       null,
       (err, result) => {
         if (err) {
-          console.log(err);
+          console.error(err);
           return;
         }
-        console.log(result);
       }
     );
   };
-
+  //logging in to the user account in Cognito
   const signIn = (username, password) => {
     setErrorMessageLogin("");
     const authData = {
@@ -62,28 +64,21 @@ const TheSignInModal = (props) => {
       Pool: userPool,
     };
     const cognitoUser = new CognitoUser(userData);
-    const that = this;
     cognitoUser.authenticateUser(authDetails, {
       onSuccess(result) {
-        console.log(result);
-        console.log(userPool.getCurrentUser());
         const user = userPool.getCurrentUser();
         user.getSession((err, session) => {
           if (err) {
-            console.log("no session: " + err);
+            console.error("no session: " + err);
           } else {
             if (session.isValid()) {
-              console.log(session);
-              console.log("session cognito nameuser: " + session.CognitoUser);
-              console.log(user);
-              console.log(user.username);
               dispatch(
                 storeActions.setNameOfUserLoggedIn(
                   session.accessToken.payload.username
                 )
               );
             } else {
-              console.log("session invalid: " + session);
+              console.error("session invalid: " + session);
             }
             closeSignInModalHandler();
           }
@@ -99,8 +94,6 @@ const TheSignInModal = (props) => {
       },
     });
   };
-  const nameOfUserLoggedIn = useSelector((state) => state.nameOfUserLoggedIn);
-  console.log("namae: " + nameOfUserLoggedIn);
 
   const nameInputRef = useRef();
   const passwordInputRef = useRef();
@@ -109,16 +102,7 @@ const TheSignInModal = (props) => {
   const [inputsAreTouched, setInputsAreTouched] = useState(false);
 
   const [errorMessageLogin, setErrorMessageLogin] = useState("");
-  //const [nameInput, setNameInput] = useState();
-  //const [passwordInput, setPasswordInput] = useState();
-
-  // const nameInputChangeHandler = (event) => {
-  //   setNameInput(event.target.value);
-  // };
-  // const passwordInputChangeHandler = (event) => {
-  //   setPasswordInput(event.target.value);
-  // };
-
+  //sending the form, checking the correctness of the inputs and making an attempt to log into the user's account with the given values in the inputs
   const formSubmissionHandler = (event) => {
     event.preventDefault();
     setInputsAreTouched(true);
@@ -127,19 +111,15 @@ const TheSignInModal = (props) => {
 
     if (nameInputValue.trim() === "") {
       setNameInputIsValid(false);
-      console.log("pusty name");
     } else {
       setNameInputIsValid(true);
     }
     if (passwordInputValue.trim() === "") {
       setPasswordInputIsValid(false);
-      console.log("pusty password");
     } else {
       setPasswordInputIsValid(true);
     }
     if (nameInputIsValid && passwordInputIsValid) {
-      console.log(nameInputValue + " " + passwordInputValue);
-      //signUp(nameInputValue, passwordInputValue);
       signIn(nameInputValue, passwordInputValue);
     }
   };
